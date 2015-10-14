@@ -107,12 +107,14 @@ class Instrument(object):
 
           # Pre-create all samples
           sig.samples = [0] * int(math.ceil(sig.length))
-
-          for i in range(int(sig.length)):
-            pure = self.samplegenfun(sig, i)
-            sample = self.applyfx(sig, pure, i, iseg)
-            sig.samples[i] = sample
-            self.nframes += 1
+          length = int(sig.length)
+          for i in range(length * 2):
+            if i >= sig.length:
+              samp = sig.samples[i - length]
+              sig.samples[i - length] = self.applyfx(sig, samp, i, iseg)
+            else:
+              sig.samples[i] = self.samplegenfun(sig, i)
+              self.nframes += 1
 
           channel.append(sig)
         else:

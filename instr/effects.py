@@ -7,7 +7,7 @@ import math
 
   The signal is the current signal being processed,
   the second parameter is the current sample of that signal,
-  the third is the index of the samples (aka the 'tick' or the 'x' of the equation)
+  the third is the index of the sample (aka the 'tick' or the 'x' of the equation)
 
   The function must return a new number, which is
   the sample processed by the fx
@@ -18,14 +18,14 @@ import math
 
 def fadein(t):
   def fn(sig, samp, x):
-    mdur = t * sig.length
-    return samp * min(sig.vol, (x / mdur))
+    mdur = t * sig.framerate
+    return samp * min(sig.vol, sig.vol * (x / mdur))
   return fn
 
 def fadeout(t):
   def fn(sig, samp, x):
-    mdur = t * sig.length
-    return samp * min(sig.vol, ((sig.length - x) / mdur))
+    mdur = t * sig.framerate
+    return samp * min(sig.vol, sig.vol * ((sig.length - x) / mdur))
   return fn
 
 def fades(tin, tout):
@@ -35,6 +35,6 @@ def echo(dist, decay):
   def fn(sig, samp, x):
     d = dist * sig.framerate
     if x + d < sig.length:
-      sig.samples[int(math.ceil(x + d))] = samp - (samp * decay)
+      sig.samples[int(x + d)] += (samp * decay)
     return samp
   return fn
