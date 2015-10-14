@@ -23,7 +23,7 @@ def fadein(t):
 def fadeout(t):
   def fn(sig, samp, x):
     mdur = t * sig.length
-    return samp * min(sig.vol, ((dur - x) / mdur))
+    return samp * min(sig.vol, ((sig.length - x) / mdur))
   return fn
 
 def fades(tin, tout):

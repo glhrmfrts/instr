@@ -38,8 +38,9 @@ class Instrument(object):
     self.channels = [[]]
     self.signalgenfun = None
     self.segments = []
+    self.segcount = 0
     self.nframes = 0
-    self.fx = [lambda sig, samp, x: samp]
+    self.fx = [(0, lambda sig, samp, x: samp)]
 
   def __add__(self, other):
     res = Instrument()
@@ -61,21 +62,23 @@ class Instrument(object):
 
   def seg(self, segments):
     self.segments += segments
+    self.segcount = len(self.segments)
     return self
 
   def loop(self, times, segments):
     self.segments += segments * times
+    self.segcount = len(self.segments)
     return self
 
   def bind(self, *fx):
-    self.fx += fx
+    for f in fx:
+      self.fx.append((self.segcount, f))
     return self
 
-  def applyfx(self, sig, samp, x):
-    transformed = samp
+  def applyfx(self, sig, samp, x, seg):
     if len(self.fx) > 1:
-      transformed = reduce(lambda s, f: f(sig, s, x), [samp] + self.fx)
-    return transformed
+      samp = reduce((lambda s, fx: fx[1](sig, s, x) if seg >= fx[0] else s), [samp] + self.fx)
+    return samp
 
   def compute(self):
     for channel in self.channels:
@@ -83,8 +86,8 @@ class Instrument(object):
       # was this channel already computed?
       computed = len(channel) > 0
       if not computed:
-        for seg in self.segments:
-
+        for iseg, seg in enumerate(self.segments):
+          print
           freq, dur, vol = 0, 0, 1
           if isinstance(seg, tuple):
             freq = seg[0]
@@ -105,14 +108,17 @@ class Instrument(object):
 
           for i in range(sig.length):
             pure = self.samplegenfun(sig, i)
-            sig.samples.append(self.applyfx(sig, pure, i))
+            sig.samples.append(self.applyfx(sig, pure, i, iseg))
 
           self.nframes += sig.length
+
+          print(sig.length)
+
           channel.append(sig)
         else:
-          for sig in channel:
+          for i, sig in enumerate(channel):
             for x in range(sig.length):
-              sig.samples[x] = self.applyfx(sig, sig.samples[x], x)
+              sig.samples[x] = self.applyfx(sig, sig.samples[x], x, i)
 
   def computeget(self):
     self.compute()
