@@ -87,7 +87,6 @@ class Instrument(object):
       computed = len(channel) > 0
       if not computed:
         for iseg, seg in enumerate(self.segments):
-          print
           freq, dur, vol = 0, 0, 1
           if isinstance(seg, tuple):
             freq = seg[0]
@@ -106,18 +105,19 @@ class Instrument(object):
           # Each segment is a new signal
           sig = Signal(freq, self.framerate, dur, self.amp, vol)
 
-          for i in range(sig.length):
+          # Pre-create all samples
+          sig.samples = [0] * int(math.ceil(sig.length))
+
+          for i in range(int(sig.length)):
             pure = self.samplegenfun(sig, i)
-            sig.samples.append(self.applyfx(sig, pure, i, iseg))
-
-          self.nframes += sig.length
-
-          print(sig.length)
+            sample = self.applyfx(sig, pure, i, iseg)
+            sig.samples[i] = sample
+            self.nframes += 1
 
           channel.append(sig)
         else:
           for i, sig in enumerate(channel):
-            for x in range(sig.length):
+            for x in range(int(sig.length)):
               sig.samples[x] = self.applyfx(sig, sig.samples[x], x, i)
 
   def computeget(self):

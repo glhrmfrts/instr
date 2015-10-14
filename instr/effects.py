@@ -1,3 +1,5 @@
+import math
+
 """
   An effect is a function of type:
 
@@ -28,3 +30,11 @@ def fadeout(t):
 
 def fades(tin, tout):
   return lambda sig, samp, x: fadeout(tout)(sig, fadein(tin)(sig, samp, x), x)
+
+def echo(dist, decay):
+  def fn(sig, samp, x):
+    d = dist * sig.framerate
+    if x + d < sig.length:
+      sig.samples[int(math.ceil(x + d))] = samp - (samp * decay)
+    return samp
+  return fn

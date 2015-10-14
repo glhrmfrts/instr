@@ -1,4 +1,4 @@
-import math
+import math, random
 from instr.instrument import Instrument
 
 class Osc(Instrument):
@@ -39,3 +39,12 @@ class Tri(Instrument):
 
   def tri(self, sig, x):
     return -sig.a + abs((x % sig.period) - sig.a)
+
+
+class White(Instrument):
+  def __init__(self):
+    Instrument.__init__(self)
+    self.samplegenfun = self.white
+
+  def white(self, sig, x):
+    return sig.a * random.randint(-1, 1)
