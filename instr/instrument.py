@@ -109,7 +109,6 @@ class Instrument(object):
 
           self.nframes += sig.length
           channel.append(sig)
-
         else:
           for sig in channel:
             for x in range(sig.length):
