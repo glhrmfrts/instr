@@ -5,37 +5,37 @@ class Osc(Instrument):
 
 	def __init__(self):
 		Instrument.__init__(self)
-		self.signalgenfun = self.osc
+		self.samplegenfun = self.osc
 
-	def osc(self, d, a, p, t):
-		return a * math.sin(2 * math.pi * (t / p))
+	def osc(self, sig, x):
+		return sig.a * math.sin(2 * math.pi * (x / sig.period))
 
 
 class Sqr(Instrument):
 
 	def __init__(self):
 		Instrument.__init__(self)
-		self.signalgenfun = self.sqr
+		self.samplegenfun = self.sqr
 
-	def sqr(self, d, a, p, t):
-		return a if (int(t / p) % 2) == 0 else -a
+	def sqr(self, sig, x):
+		return sig.a if (int(x / sig.period) % 2) == 0 else -sig.a
 
 
 class Saw(Instrument):
 
 	def __init__(self):
 		Instrument.__init__(self)
-		self.signalgenfun = self.saw
+		self.samplegenfun = self.saw
 
-	def saw(self, d, a, p, t):
-		return a * ((t % p) / p * 2 - 1)
+	def saw(self, sig, x):
+		return sig.a * ((x % sig.period) / sig.period * 2 - 1)
 
 
 class Tri(Instrument):
 
 	def __init__(self):
 		Instrument.__init__(self)
-		self.signalgenfun = self.tri
+		self.samplegenfun = self.tri
 
-	def tri(self, d, a, p ,t):
-		return -a + abs((t % p) - a)
+	def tri(self, sig, x):
+		return -sig.a + abs((x % sig.period) - sig.a)
