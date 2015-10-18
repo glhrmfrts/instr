@@ -63,9 +63,17 @@ def echo(dist, decay):
     length = len(samples)
     for x in range(length):
       if x + d < length:
-        # mod = int((modwave[x] / 2 + 0.5))
-        out[int(x + d)] += (out[x] - out[x] * decay)# + mod
+        out[int(x + d)] += (out[x] - out[x] * decay)
     return out
 
-  # The echo needs all signals together
+  # The echo needs all samples together
   return Effect(fn, final=True)
+
+def tremolo(dry=0.5, wet=0.5):
+  def fn(sig):
+    out = [0] * len(sig)
+    modwave = Osc().sig(sig.frequency, sig.dur) 
+    for x in range(len(sig)):
+      out[x] = sig[x] * dry + (sig[x] * (modwave[x] / sig.a) * wet)
+    return out
+  return Effect(fn)
