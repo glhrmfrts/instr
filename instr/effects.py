@@ -1,5 +1,5 @@
 import math
-from instr.instruments import Osc
+from instr.instruments import Osc, Sqr
 
 """
   An effect is a function of type:
@@ -69,11 +69,11 @@ def echo(dist, decay):
   # The echo needs all samples together
   return Effect(fn, final=True)
 
-def tremolo(dry=0.5, wet=0.5):
+def tremolo(level=0.1):
   def fn(sig):
     out = [0] * len(sig)
-    modwave = Osc().sig(sig.frequency, sig.dur) 
+    modwave = Sqr().setamp(1).sig(sig.frequency - 5, sig.dur) 
     for x in range(len(sig)):
-      out[x] = sig[x] * dry + (sig[x] * (modwave[x] / sig.a) * wet)
+      out[x] = sig[x] * (1.0 - level) + (sig[x] * (modwave[x]) * level)
     return out
   return Effect(fn)

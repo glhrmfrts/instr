@@ -28,8 +28,12 @@ class BaseInstrument(object):
     res.final_fx += self.final_fx + other.final_fx
     return res
 
-  def setvol(self, a):
+  def setvol(self, vol):
     self.vol = vol
+    return self
+
+  def setamp(self, amp):
+    self.amp = amp
     return self
 
   def setfreq(self, freq):
